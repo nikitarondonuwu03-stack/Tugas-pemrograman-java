@@ -1,0 +1,36 @@
+package id.ac.trinita.stream;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class FinancialAnalyticsEngine {
+
+    /* Mengambil 3 transaksi transfer bernilai terbesar untuk rekening tertentu. */
+     public List<Transaction>
+getTop3LargestTransfer(List<Transaction>transaction, String accountId) {
+     return transaction.stream().filter(t -> t.accountId().equals(accountId))
+     .filter(t -> t.type() == TransactionType.TRANSFER)
+     .sorted(Comparator.comparingDouble(Transaction::amount).reversed())
+     .limit(3)
+     .toList(); // Java 16+ 
+     }
+
+    /* Mengelompokkan transaksi berdasarkan Kota dan menjumlahkan total perputaran uang. */
+   public Map<String, Double>
+   calculateTotalVolumePerCity(List<Transaction> transaction) {
+    return transaction.stream()
+    .collect(Collectors.groupingBy(Transaction::locationCity,
+        Collectors.summingDouble(Transaction::amount) ));
+}
+    /* Mempartisi transaksi menjadi Transaksi Aman vs Transaksi Mencurigakan (Fraud Risk). */
+   public Map<Boolean, List<Transaction>> 
+   partitionBySuspiciousRisk(List<Transaction> transaction) {
+    return transaction.stream()
+    .collect(Collectors.partitioningBy(Transaction::isFlaggedSuspicious));
+   }
+    /* Menghitung statistik lengkap nominal transaksi  (Min, Max, Avg, Sum, Count). */
+   public DoubleSummaryStatistics getTransactionSummary(List<Transaction> transaction) {
+    return transaction.stream()
+    .collect(Collectors.summarizingDouble(Transaction::amount));
+   }
+}
